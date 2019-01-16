@@ -4,7 +4,7 @@ phases:
 - phase: Phase_1
 
   queue:
-    name: Hosted macOS Preview
+    name: "Hosted macOS Preview"
   steps:
   - script: |  
      cd $(Build.ArtifactStagingDirectory)
@@ -12,10 +12,10 @@ phases:
      echo "bye" > bye.txt
      
       
-    displayName: Create two text files
+    displayName: "Create two text files"
 
   - task: PublishBuildArtifacts@1
-    displayName: Publish Artifact: drop
+    displayName: "Publish Artifact: drop"
     inputs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
       ArtifactName: drop
@@ -25,9 +25,9 @@ phases:
 - phase: Agent_phase
 
   queue:
-    name: Hosted macOS Preview
+    name: "Hosted macOS Preview"
   steps:
   - task: DownloadBuildArtifacts@0
-    displayName: Download Build Artifacts
+    displayName: "Download Build Artifacts"
     inputs:
       artifactName: drop
