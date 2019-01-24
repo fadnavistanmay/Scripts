@@ -1,10 +1,8 @@
-resources:
-- repo: self
-phases:
-- phase: Upload
-
-  queue:
-    name: "Hosted macOS Preview"
+trigger:
+- master
+jobs:
+- job: publish
+  pool: 'default'
   steps:
   - script: |  
      cd $(Build.ArtifactStagingDirectory)
@@ -16,21 +14,19 @@ phases:
      cd nc
      mkdir durham
      cd durham
-     echo "hello from Durham" > greeting.txt 
-    displayName: "Create some text files"
+     echo "hello from Durham" > greeting.txt
 
+    displayName: Create some text files
   - task: PublishBuildArtifacts@1
     displayName: "Publish Artifact: drop"
     inputs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
       ArtifactName: drop
       publishLocation: Container
-
-
-- phase: Download
-
-  queue:
-    name: "Hosted macOS Preview"
+- job: download
+  dependsOn: publish
+  condition: succeeded()
+  pool: 'default'
   steps:
   - task: DownloadBuildArtifacts@0
     displayName: "Download Build Artifacts"
