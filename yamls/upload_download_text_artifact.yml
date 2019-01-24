@@ -1,7 +1,7 @@
 resources:
 - repo: self
 phases:
-- phase: Phase_1
+- phase: Upload
 
   queue:
     name: "Hosted macOS Preview"
@@ -10,9 +10,14 @@ phases:
      cd $(Build.ArtifactStagingDirectory)
      echo "hello world" > hi.txt
      echo "bye" > bye.txt
-     
-      
-    displayName: "Create two text files"
+     mkdir usa
+     cd usa
+     mkdir nc
+     cd nc
+     mkdir durham
+     cd durham
+     echo "hello from Durham" > greeting.txt 
+    displayName: "Create some text files"
 
   - task: PublishBuildArtifacts@1
     displayName: "Publish Artifact: drop"
@@ -22,7 +27,7 @@ phases:
       publishLocation: Container
 
 
-- phase: Agent_phase
+- phase: Download
 
   queue:
     name: "Hosted macOS Preview"
