@@ -1,7 +1,7 @@
 trigger:
 - master
 jobs:
-- job: publish
+- job: publishhh
   pool:
     vmImage: 'macOS-10.13'
   steps:
@@ -24,8 +24,8 @@ jobs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
       ArtifactName: drop
       publishLocation: Container
-- job: download
-  dependsOn: publish
+- job: downloaddd
+  dependsOn: publishhh
   condition: succeeded()
   pool:
     vmImage: 'macOS-10.13'
