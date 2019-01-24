@@ -5,28 +5,31 @@ jobs:
   pool:
     vmImage: 'macOS-10.13'
   steps:
-  - script: |  
+  - bash: |  
      cd $(Build.ArtifactStagingDirectory)
      echo "hello world" > hi.txt
      echo "bye" > bye.txt
-     mkdir fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
-     cd fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
-     mkdir fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
-     cd fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
-     mkdir fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
-     cd fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
-     mkdir fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
-     cd fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
-     echo "GotHere" > 206.txt
-     #mkdir fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
-     #cd fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
-     #echo "GotHere" > 256.txt
-     #mkdir fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
-     #cd fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
-     #echo "GotHere" > 306.txt
-     #mkdir fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
-     #cd fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
-     #echo "GotHere" > 356.txt
+     mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     echo "GotHere" > 56.txt
+     mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     echo "GotHere" > 107.txt
+     mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     echo "GotHere" > 157.txt
+     mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     echo "GotHere" > 207.txt
+     #mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     #cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     #echo "GotHere" > 257.txt
+     #mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     #cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     #echo "GotHere" > 307.txt
+     #mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     #cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     #echo "GotHere" > 357.txt
 
     displayName: Create some text files
   - task: PublishBuildArtifacts@1
