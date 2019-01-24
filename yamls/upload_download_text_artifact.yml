@@ -2,7 +2,8 @@ trigger:
 - master
 jobs:
 - job: publish
-  pool: 'default'
+  pool:
+    vmImage: 'macOS-10.13'
   steps:
   - script: |  
      cd $(Build.ArtifactStagingDirectory)
@@ -26,7 +27,8 @@ jobs:
 - job: download
   dependsOn: publish
   condition: succeeded()
-  pool: 'default'
+  pool:
+    vmImage: 'macOS-10.13'
   steps:
   - task: DownloadBuildArtifacts@0
     displayName: "Download Build Artifacts"
