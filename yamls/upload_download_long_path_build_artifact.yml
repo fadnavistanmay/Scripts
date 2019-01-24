@@ -1,0 +1,47 @@
+trigger:
+- master
+jobs:
+- job: publishhh
+  pool:
+    vmImage: 'macOS-10.13'
+  steps:
+  - script: |  
+     cd $(Build.ArtifactStagingDirectory)
+     echo "hello world" > hi.txt
+     echo "bye" > bye.txt
+     mkdir fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
+     cd fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
+     mkdir fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
+     cd fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
+     mkdir fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
+     cd fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
+     mkdir fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
+     cd fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
+     echo "GotHere" > 206.txt
+     #mkdir fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
+     #cd fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
+     #echo "GotHere" > 256.txt
+     #mkdir fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
+     #cd fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
+     #echo "GotHere" > 306.txt
+     #mkdir fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
+     #cd fortyNine1234567890abcdefghijklmnopqrstuvwxyz1234
+     #echo "GotHere" > 356.txt
+
+    displayName: Create some text files
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish Artifact: drop"
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: drop
+      publishLocation: Container
+- job: downloaddd
+  dependsOn: publishhh
+  condition: succeeded()
+  pool:
+    vmImage: 'macOS-10.13'
+  steps:
+  - task: DownloadBuildArtifacts@0
+    displayName: "Download Build Artifacts"
+    inputs:
+      artifactName: drop
