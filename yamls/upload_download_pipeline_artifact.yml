@@ -18,12 +18,11 @@ jobs:
      echo "hello from Durham" > greeting.txt
 
     displayName: Create some text files
-    publish: 
   - task: PublishPipelineArtifact@1
     displayName: "Publish Pipeline Artifact: deedoop"
     inputs:
-      targetPath: '$(Build.ArtifactStagingDirectory)'
       artifactName: deedoop
+      targetPath: '$(Build.ArtifactStagingDirectory)'
 - job: downloaddd
   dependsOn: publishhh
   condition: succeeded()
