@@ -18,7 +18,7 @@ jobs:
      echo "hello from Durham" > greeting.txt
 
     displayName: Create some text files
-  - task: PublishPipelineArtifact@1
+  - task: PublishPipelineArtifact@0
     displayName: "Publish Pipeline Artifact: deedoop"
     inputs:
       artifactName: deedoop
