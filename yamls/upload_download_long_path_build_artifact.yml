@@ -10,7 +10,7 @@ jobs:
   pool:
     vmImage: $(uploadVmImage)
   steps:
-  - bash: |  
+  - script: |  
      cd $(Build.ArtifactStagingDirectory)
      echo "hello world" > hi.txt
      echo "bye" > bye.txt
