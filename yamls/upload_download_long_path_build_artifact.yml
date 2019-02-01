@@ -3,7 +3,7 @@ trigger:
 jobs:
 - job: publishhh
   pool:
-    vmImage: 'macOS-10.13'
+    vmImage: 'Ubuntu-16.04'
   steps:
   - bash: |  
      cd $(Build.ArtifactStagingDirectory)
@@ -21,15 +21,15 @@ jobs:
      mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
      cd fortyNineCharactersFollowedByASlashMakesFiftyChar
      echo "GotHere" > 207.txt
-     #mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
-     #cd fortyNineCharactersFollowedByASlashMakesFiftyChar
-     #echo "GotHere" > 257.txt
-     #mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
-     #cd fortyNineCharactersFollowedByASlashMakesFiftyChar
-     #echo "GotHere" > 307.txt
-     #mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
-     #cd fortyNineCharactersFollowedByASlashMakesFiftyChar
-     #echo "GotHere" > 357.txt
+     mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     echo "GotHere" > 257.txt
+     mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     echo "GotHere" > 307.txt
+     mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     echo "GotHere" > 357.txt
 
     displayName: Create some text files
   - task: PublishBuildArtifacts@1
@@ -42,7 +42,7 @@ jobs:
   dependsOn: publishhh
   condition: succeeded()
   pool:
-    vmImage: 'macOS-10.13'
+    vmImage: 'Ubuntu-16.04'
   steps:
   - task: DownloadBuildArtifacts@0
     displayName: "Download Build Artifacts"
