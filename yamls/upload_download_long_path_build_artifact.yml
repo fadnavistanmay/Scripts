@@ -1,9 +1,14 @@
 trigger:
 - master
+
+variables:
+  uploadVmImage: 'Ubuntu-16.04'
+  downloadVmImage: 'Ubuntu-16.04'
+  
 jobs:
 - job: publishhh
   pool:
-    vmImage: 'Ubuntu-16.04'
+    vmImage: $(uploadVmImage)
   steps:
   - bash: |  
      cd $(Build.ArtifactStagingDirectory)
@@ -42,7 +47,7 @@ jobs:
   dependsOn: publishhh
   condition: succeeded()
   pool:
-    vmImage: 'Ubuntu-16.04'
+    vmImage: $(downloadVmImage)
   steps:
   - task: DownloadBuildArtifacts@0
     displayName: "Download Build Artifacts"
