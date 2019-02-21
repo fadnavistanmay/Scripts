@@ -22,9 +22,8 @@ jobs:
   - task: PublishPipelineArtifact@0
     displayName: "Publish Artifact: drop"
     inputs:
-      PathtoPublish: art1
-      ArtifactName: drop
-      publishLocation: Container
+      targetPath: art1
+      artifactName: drop
 
 - job: publish2
   pool:
@@ -42,9 +41,8 @@ jobs:
   - task: PublishPipelineArtifact@0
     displayName: "Publish Artifact: drop"
     inputs:
-      PathtoPublish: art2
-      ArtifactName: drop
-      publishLocation: Container
+      targetPath: art2
+      artifactName: drop
 
 - job: download
   dependsOn: [ publish1, publish2 ]
