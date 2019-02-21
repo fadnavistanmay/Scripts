@@ -47,7 +47,7 @@ jobs:
       publishLocation: Container
 
 - job: download
-  dependsOn: publish1,publish2
+  dependsOn: [ publish1, publish2 ]
   condition: succeeded()
   pool:
     vmImage: $(downloadVmImage)
