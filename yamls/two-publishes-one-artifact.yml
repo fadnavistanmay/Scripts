@@ -18,7 +18,7 @@ jobs:
      echo "hello world" > hi.txt
      echo "bye" > bye.txt
      
-     displayName: Create first folder for artifact
+    displayName: Create first folder for artifact
   - task: PublishBuildArtifacts@1
     displayName: "Publish Artifact: drop"
     inputs:
@@ -38,7 +38,7 @@ jobs:
      echo "hello world" > hi2.txt
      echo "bye" > bye2.txt
      
-     displayName: Create second folder for artifact
+    displayName: Create second folder for artifact
   - task: PublishBuildArtifacts@1
     displayName: "Publish Artifact: drop"
     inputs:
