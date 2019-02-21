@@ -19,7 +19,7 @@ jobs:
      echo "bye" > bye.txt
      
     displayName: Create first folder for artifact
-  - task: PublishPipelineArtifacts@1
+  - task: PublishPipelineArtifact@0
     displayName: "Publish Artifact: drop"
     inputs:
       PathtoPublish: art1
@@ -39,7 +39,7 @@ jobs:
      echo "bye" > bye2.txt
      
     displayName: Create second folder for artifact
-  - task: PublishPipelineArtifacts@1
+  - task: PublishPipelineArtifact@0
     displayName: "Publish Artifact: drop"
     inputs:
       PathtoPublish: art2
