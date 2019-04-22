@@ -17,6 +17,39 @@ jobs:
      cd firstPublish
      echo "hello world" > hi.txt
      echo "bye" > bye.txt
+     echo "goodbye" > goodbye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
      
     displayName: Create first folder for artifact
   - task: PublishPipelineArtifact@0
