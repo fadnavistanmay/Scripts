@@ -19,9 +19,11 @@ steps:
       TIMES_I_MESSED_UP = 0
     path: '$(System.DefaultWorkingDirectory)/docker'
 - script: docker images --all
+- script: ls /var/lib/docker/aufs/layers & echo layers
 - script: docker build -f Dockerfile -t $(imageName) .
   displayName: 'docker build'
 - script: docker images --all
+- script: ls /var/lib/docker/aufs/layers & echo layers
 - task: SaveCache@0
   inputs:
     key: |
