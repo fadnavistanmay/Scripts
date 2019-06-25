@@ -19,9 +19,11 @@ steps:
       TIMES_I_MESSED_UP = 0
     path: '/var/lib/docker/image/overlay2/imagedb'
 - script: docker images --all
+- script: sudo ls -l /var/lib/docker/image/overlay2/imagedb
 - script: docker build -f Dockerfile -t $(imageName) .
   displayName: 'docker build'
 - script: docker images --all
+- script: sudo ls -l /var/lib/docker/image/overlay2/imagedb
 - task: SaveCache@0
   inputs:
     key: |
