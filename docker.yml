@@ -10,5 +10,23 @@ variables:
   imageName: 'your-container-image-name:$(build.buildId)'
 
 steps:
+- task: RestoreCache@0
+  inputs:
+    key: |
+      $(System.DefaultWorkingDirectory)/DockerFile
+      $(Agent.OS)
+      $(Agent.JobName)
+      TIMES_I_MESSED_UP = 0
+    path: '$(System.DefaultWorkingDirectory)/docker'
+- script: ls -l
 - script: docker build -f Dockerfile -t $(imageName) .
   displayName: 'docker build'
+- script: ls -l
+- task: SaveCache@0
+  inputs:
+    key: |
+      $(System.DefaultWorkingDirectory)/DockerFile
+      $(Agent.OS)
+      $(Agent.JobName)
+      TIMES_I_MESSED_UP = 0
+    path: '$(System.DefaultWorkingDirectory)/docker'
