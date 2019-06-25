@@ -17,13 +17,11 @@ steps:
       $(Agent.OS)
       $(Agent.JobName)
       TIMES_I_MESSED_UP = 0
-    path: '$(System.DefaultWorkingDirectory)/docker'
+    path: '/var/lib/docker/image/overlay2/imagedb'
 - script: docker images --all
-- script: sudo find /var/lib/docker
 - script: docker build -f Dockerfile -t $(imageName) .
   displayName: 'docker build'
 - script: docker images --all
-- script: sudo find /var/lib/docker
 - task: SaveCache@0
   inputs:
     key: |
@@ -31,4 +29,4 @@ steps:
       $(Agent.OS)
       $(Agent.JobName)
       TIMES_I_MESSED_UP = 0
-    path: '$(System.DefaultWorkingDirectory)/docker'
+    path: '/var/lib/docker/image/overlay2/imagedb'
