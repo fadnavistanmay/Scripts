@@ -10,7 +10,7 @@ variables:
   imageName: 'your-container-image-name:$(build.buildId)'
   system.debug: true
   agent.diagnostic: true
-  DOCKER_ROOT: $(DOCKER_ROOT)
+  DOCKER_ROOT: /var/lib/docker
   DOCKER_CACHE_FOLDER: /var/lib/docker/image/overlay2/imagedb
 
 steps:
