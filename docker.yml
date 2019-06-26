@@ -4,39 +4,44 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 pool:
-  # vmImage: 'Ubuntu 16.04'
-  name: 'jericksurface'
+  vmImage: 'Ubuntu 16.04'
 
 variables:
   imageName: 'your-container-image-name:$(build.buildId)'
   system.debug: true
   agent.diagnostic: true
-  DOCKER_ROOT: /var/lib/docker
-  DOCKER_CACHE_FOLDER: /var/lib/docker
+  DOCKER_FOLDER: $(System.DefaultWorkingDirectory)/dockercache
+  DOCKER_FILE: $(DOCKER_FOLDER)/$(imageName)
   TIMES_I_MESSED_UP: 3
 
 steps:
-# - script: |
-#     sudo chmod -c -R 777 $(DOCKER_ROOT)
-#     ls -l $(DOCKER_CACHE_FOLDER)
-#     ls -ld $(find $(DOCKER_CACHE_FOLDER))
-#     tree $(DOCKER_ROOT)
-# - task: Cache@0
-#   inputs:
-#     key: |
-#       $(System.DefaultWorkingDirectory)/DockerFile
-#       $(Agent.OS)
-#       $(Agent.JobName)
-#       $(DOCKER_ROOT)
-#       $(DOCKER_CACHE_FOLDER)
-#       TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
-#     path: '$(DOCKER_CACHE_FOLDER)'
+- task: Cache@0
+  inputs:
+    key: |
+      $(System.DefaultWorkingDirectory)/DockerFile
+      $(Agent.OS)
+      $(Agent.JobName)
+      $(DOCKER_ROOT)
+      $(DOCKER_CACHE_FOLDER)
+      TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
+    path: '$(DOCKER_FOLDER)'
 - script: docker images --all
+  displayName: Dump images
+- script: |
+    if [[ -f ${DOCKER_FILE} ]]; then docker load -i ${DOCKER_FILE}; fi
 - script: docker build -f Dockerfile -t $(imageName) .
   displayName: 'docker build'
 - script: docker images --all
-# - script: |
-#     sudo chmod -c -R 777 $(DOCKER_ROOT)
-#     ls -l $(DOCKER_CACHE_FOLDER)
-#     ls -ld $(find $(DOCKER_CACHE_FOLDER))
-#     tree $(DOCKER_ROOT)
+  displayName: Dump images  
+- script: |
+    docker save ${imageName} | gzip -c > ${DOCKER_FILE}
+- task: SaveCache@0
+  inputs:
+    key: |
+      $(System.DefaultWorkingDirectory)/DockerFile
+      $(Agent.OS)
+      $(Agent.JobName)
+      $(DOCKER_ROOT)
+      $(DOCKER_CACHE_FOLDER)
+      TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
+    path: $(DOCKER_FOLDER)
