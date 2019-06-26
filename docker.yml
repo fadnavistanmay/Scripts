@@ -89,13 +89,18 @@ steps:
 - script: |
     set -e -x
     sudo buildkitd --debug --root /var/lib/buildkit &
-    sudo buildctl du -v
+    
+    until buildctl du -v
+    do
+      echo "Waiting for daemon to load"
+      sleep 1
+    done
+
     if [ -d "$(BUILD_KIT_CACHE)" ]; then
         sudo $(DOCKER_COMMAND) --import-cache type=local,src=$(BUILD_KIT_CACHE)
     else 
         sudo $(DOCKER_COMMAND)
     fi
-    kill $(jobs -p)
   displayName: 'docker build'
 
 # - task: SaveCache@0
