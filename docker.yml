@@ -87,8 +87,8 @@ steps:
 #   condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
 
 - script: |
-    sudo buildkitd --debug --root /var/lib/buildkit &
-    sleep 5
+    sudo buildkitd --debug --root /var/lib/buildkit 1>/dev/null 2>/dev/null </dev/null &
+    sleep 10
     buildctl du -v
     $(DOCKER_COMMAND)
   displayName: 'docker build'
