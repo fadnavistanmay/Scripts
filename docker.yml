@@ -27,10 +27,10 @@ variables:
   CACHE_KEY_EXACT: |
     $(CACHE_KEY_BASE)
     $(System.DefaultWorkingDirectory)/Dockerfile
-  CACHE_FALLBACK_COMMIT_FILE: $(Pipeline.Workspace)/common_commit.txt
-  CACHE_KEY_FALLBACK: |
-    $(CACHE_KEY_BASE)
-    $(CACHE_FALLBACK_COMMIT_FILE)
+  # CACHE_FALLBACK_COMMIT_FILE: $(Pipeline.Workspace)/common_commit.txt
+  # CACHE_KEY_FALLBACK: |
+  #   $(CACHE_KEY_BASE)
+  #   $(CACHE_FALLBACK_COMMIT_FILE)
 
 steps:
 - task: RestoreCache@0
@@ -40,18 +40,18 @@ steps:
     cacheHitVar: 'DockerCacheHitExact'
   displayName: 'Look for exact hit'
 
-- script: |
-    git merge-base -a origin/master HEAD > $(CACHE_FALLBACK_COMMIT_FILE)
-    cat $(CACHE_FALLBACK_COMMIT_FILE)
-  # condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
+# - script: |
+#     git merge-base -a origin/master HEAD > $(CACHE_FALLBACK_COMMIT_FILE)
+#     cat $(CACHE_FALLBACK_COMMIT_FILE)
+#   # condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
 
-- task: RestoreCache@0
-  inputs:
-    key: $(CACHE_KEY_FALLBACK)
-    path: '$(DOCKER_FOLDER_TAR_FOLDER)'
-    cacheHitVar: 'DockerCacheHitFallback'
-  displayName: 'Look for inexact hit'
-  condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
+# - task: RestoreCache@0
+#   inputs:
+#     key: $(CACHE_KEY_FALLBACK)
+#     path: '$(DOCKER_FOLDER_TAR_FOLDER)'
+#     cacheHitVar: 'DockerCacheHitFallback'
+#   displayName: 'Look for inexact hit'
+#   condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
 
 - script: |
     docker images --all
@@ -76,15 +76,16 @@ steps:
     sudo service docker stop
     mkdir $(DOCKER_FOLDER_TAR_FOLDER)
     sudo $(TAR_COMMAND)
-  condition: and(succeeded(), or(ne(variables['PipelineCache.DockerCacheHitExact'], 'True'),ne(variables['PipelineCache.DockerCacheHitFallback'], 'True')))
+  condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
+  # condition: and(succeeded(), or(ne(variables['PipelineCache.DockerCacheHitExact'], 'True'),ne(variables['PipelineCache.DockerCacheHitFallback'], 'True')))
   displayName: 'TAR up the docker folder'
   
 
-- task: SaveCache@0
-  inputs:
-    key: $(CACHE_KEY_FALLBACK)
-    path: '$(DOCKER_FOLDER_TAR_FOLDER)'
-  condition: and(and(succeeded(), ne(variables['PipelineCache.DockerCacheHitFallback'], 'True')), eq(variables['Build.SourceBranchName'], 'master'))
+# - task: SaveCache@0
+#   inputs:
+#     key: $(CACHE_KEY_FALLBACK)
+#     path: '$(DOCKER_FOLDER_TAR_FOLDER)'
+#   condition: and(and(succeeded(), ne(variables['PipelineCache.DockerCacheHitFallback'], 'True')), eq(variables['Build.SourceBranchName'], 'master'))
 - task: SaveCache@0
   inputs:
     key: $(CACHE_KEY_EXACT)
