@@ -19,6 +19,7 @@ steps:
     sudo chmod -c -R 777 $(DOCKER_ROOT)
     ls -l $(DOCKER_CACHE_FOLDER)
     ls -ld $(find $(DOCKER_CACHE_FOLDER))
+    tree $(DOCKER_ROOT)
 - task: RestoreCache@0
   inputs:
     key: |
@@ -39,6 +40,7 @@ steps:
     sudo chmod -c -R 777 $(DOCKER_ROOT)
     ls -l $(DOCKER_CACHE_FOLDER)
     ls -ld $(find $(DOCKER_CACHE_FOLDER))
+    tree $(DOCKER_ROOT)
 - task: SaveCache@0
   inputs:
     key: |
