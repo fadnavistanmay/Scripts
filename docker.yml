@@ -12,7 +12,7 @@ variables:
   agent.diagnostic: true
   DOCKER_ROOT: /var/lib/docker
   DOCKER_CACHE_FOLDER: /var/lib/docker
-  TIMES_I_MESSED_UP: 2
+  TIMES_I_MESSED_UP: 3
 
 steps:
 - script: |
@@ -20,7 +20,7 @@ steps:
     ls -l $(DOCKER_CACHE_FOLDER)
     ls -ld $(find $(DOCKER_CACHE_FOLDER))
     tree $(DOCKER_ROOT)
-- task: RestoreCache@0
+- task: Cache@0
   inputs:
     key: |
       $(System.DefaultWorkingDirectory)/DockerFile
@@ -29,7 +29,7 @@ steps:
       $(DOCKER_ROOT)
       $(DOCKER_CACHE_FOLDER)
       TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
-    path: $(DOCKER_CACHE_FOLDER)
+    path: '$(DOCKER_CACHE_FOLDER)'
 - script: docker images --all
 # - script: 
 - script: docker build -f Dockerfile -t $(imageName) .
@@ -40,13 +40,3 @@ steps:
     ls -l $(DOCKER_CACHE_FOLDER)
     ls -ld $(find $(DOCKER_CACHE_FOLDER))
     tree $(DOCKER_ROOT)
-- task: SaveCache@0
-  inputs:
-    key: |
-      $(System.DefaultWorkingDirectory)/DockerFile
-      $(Agent.OS)
-      $(Agent.JobName)
-      $(DOCKER_ROOT)
-      $(DOCKER_CACHE_FOLDER)
-      TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
-    path: $(DOCKER_CACHE_FOLDER)
