@@ -7,7 +7,7 @@ use std;
 use std::collections::BTreeSet;
 use std::io::*;
 
-// COMMENT #1
+// Comment #2
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 struct SuiteResults {

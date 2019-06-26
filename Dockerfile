@@ -2,6 +2,7 @@
 FROM rust:1.31
 
 # more setup and adding of tools ...
+# COMMENT 1
 
 # Set the working directory to /app
 WORKDIR /
@@ -12,4 +13,4 @@ ADD src/* /src/
 
 RUN cargo build
 
-# RUN cargo build --release
+RUN cargo build --release
