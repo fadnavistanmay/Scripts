@@ -19,7 +19,7 @@ variables:
     $(BUILDKIT_COMMIT)
     GOOFS=0
 
-  DOCKER_COMMAND: 'buildctl build --frontend=dockerfile.v0 --local context=. --local dockerfile=. --export-cache type=local,dest=$(BUILD_KIT_CACHE)'
+  DOCKER_COMMAND: 'buildctl build --frontend=dockerfile.v0 --local context=. --local dockerfile=.'
   TAR_COMMAND: 'tar -cf $(DOCKER_FOLDER_TAR) --absolute-names $(DOCKER_FOLDER)'
   TIMES_I_MESSED_UP: 11
   CACHE_KEY_BASE: |
@@ -95,12 +95,17 @@ steps:
       echo "Waiting for daemon to load"
       sleep 1
     done
-
+    
     if [ -d "$(BUILD_KIT_CACHE)" ]; then
-        sudo $(DOCKER_COMMAND) --import-cache type=local,src=$(BUILD_KIT_CACHE)
-    else 
-        sudo $(DOCKER_COMMAND)
+      DOCKER_COMMAND="$DOCKER_COMMAND --import-cache type=local,src=$BUILD_KIT_CACHE"
     fi
+
+    if [ $PipelineCache_BuildKitCacheHit != "True" ]; then 
+      DOCKER_COMMAND="$DOCKER_COMMAND --export-cache type=local,dest=$(BUILD_KIT_CACHE)"
+    fi
+
+    sudo $(DOCKER_COMMAND)
+
     sudo kill -9 $(jobs -p)
   displayName: 'docker build'
 
