@@ -8,11 +8,14 @@ pool:
 
 variables:
   imageName: 'your-container-image-name'
-  system.debug: true
-  agent.diagnostic: true
-  DOCKER_FOLDER: $(Pipeline.Workspace)/dockercache
-  DOCKER_FILE: $(DOCKER_FOLDER)/images
-  IMAGES: '$(imageName) rust:1.31'
+  BASE_IMAGE_NAME: 'rust:1.31'
+  system.debug: 'true'
+  agent.diagnostic: 'true'
+  DOCKER_FOLDER: '$(Pipeline.Workspace)/dockercache'
+  DOCKER_FILE: '$(DOCKER_FOLDER)/images'
+  IMAGES: '$(imageName) $(BASE_IMAGE_NAME)'
+  DOCKER_CACHE_HIT_COMMAND: 'docker build --cache-from=$(BASE_IMAGE_NAME) -f Dockerfile -t $(imageName) .'
+  DOCKER_CACHE_MISS_COMMAND: 'docker build --rm=false -f Dockerfile -t $(imageName) .'
   TIMES_I_MESSED_UP: 5
 
 steps:
@@ -20,11 +23,11 @@ steps:
   inputs:
     key: |
       $(System.DefaultWorkingDirectory)/DockerFile
-      $(Agent.OS)
-      $(Agent.JobName)
+      $(Agent.OS) $(Agent.JobName)
       DOCKER_FILE = $(DOCKER_FILE)
-      $(imageName)
       $(IMAGES)
+      $(DOCKER_CACHE_HIT_COMMAND)
+      $(DOCKER_CACHE_MISS_COMMAND)
       TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
     path: '$(DOCKER_FOLDER)'
     cacheHitVar: 'DockerCacheHit'
@@ -38,8 +41,14 @@ steps:
 # - script: docker images --all
 #   displayName: Dump images
 
-- script: docker build -f Dockerfile -t $(imageName) .
-  displayName: 'docker build'
+- script: $(DOCKER_CACHE_HIT_COMMAND)
+  displayName: 'docker build (cache hit)'
+  condition: and(succeeded(), eq(variables['PipelineCache.DockerCacheHit'], 'True'))
+
+- script: $(DOCKER_CACHE_MISS_COMMAND)
+  displayName: 'docker build (cache miss)'
+  condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHit'], 'True'))
+
 # - script: docker images --all
 #   displayName: Dump images  
 
@@ -51,11 +60,11 @@ steps:
   inputs:
     key: |
       $(System.DefaultWorkingDirectory)/DockerFile
-      $(Agent.OS)
-      $(Agent.JobName)
+      $(Agent.OS) $(Agent.JobName)
       DOCKER_FILE = $(DOCKER_FILE)
-      $(imageName)
       $(IMAGES)
+      $(DOCKER_CACHE_HIT_COMMAND)
+      $(DOCKER_CACHE_MISS_COMMAND)
       TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
     path: $(DOCKER_FOLDER)
   condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHit'], 'True'))
