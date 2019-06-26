@@ -87,15 +87,15 @@ steps:
 #   condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
 
 - script: |
+    set -e -x
     sudo buildkitd --debug --root /var/lib/buildkit &
-    sleep 10
     sudo buildctl du -v
-    ls $(BUILD_KIT_CACHE)
     if [ -d "$(BUILD_KIT_CACHE)" ]; then
         sudo $(DOCKER_COMMAND) --import-cache type=local,src=$(BUILD_KIT_CACHE)
     else 
         sudo $(DOCKER_COMMAND)
     fi
+    kill $(jobs -p)
   displayName: 'docker build'
 
 # - task: SaveCache@0
