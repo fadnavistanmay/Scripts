@@ -40,7 +40,7 @@ steps:
 
 - script: |
     docker rmi $(docker images -a -q)
-    docker system prune -a
+    docker system prune --all --force
   condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHit'], 'True'))
   displayName: clear out existing images (hack)
 
