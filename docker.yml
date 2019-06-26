@@ -10,13 +10,13 @@ variables:
   imageName: 'your-container-image-name:$(build.buildId)'
   system.debug: true
   agent.diagnostic: true
-  DOCKER_ROOT: /var/lib/docker/image/overlay2/imagedb
+  DOCKER_ROOT: $(DOCKER_ROOT)
+  DOCKER_CACHE_FOLDER: /var/lib/docker/image/overlay2/imagedb
 
 steps:
 - script: |
-    sudo chown -v -R me $(DOCKER_ROOT)
-    sudo chmod -v -R 777 $(DOCKER_ROOT)
-    ls -l $(DOCKER_ROOT)
+    sudo chmod -R 777 $(DOCKER_ROOT)
+    ls -l $(DOCKER_CACHE_FOLDER)
 - task: RestoreCache@0
   inputs:
     key: |
@@ -24,8 +24,9 @@ steps:
       $(Agent.OS)
       $(Agent.JobName)
       $(DOCKER_ROOT)
+      $(DOCKER_CACHE_FOLDER)
       TIMES_I_MESSED_UP = 0
-    path: $(DOCKER_ROOT)
+    path: $(DOCKER_CACHE_FOLDER)
 - script: docker images --all
 # - script: 
 - script: docker build -f Dockerfile -t $(imageName) .
@@ -33,9 +34,8 @@ steps:
 - script: docker images --all
 # - script: sudo ls -l /var/lib/docker/image/overlay2/imagedb
 - script: |
-    sudo chown -v -R me $(DOCKER_ROOT)
     sudo chmod -v -R 777 $(DOCKER_ROOT)
-    ls -l $(DOCKER_ROOT)
+    ls -l $(DOCKER_CACHE_FOLDER)
 - task: SaveCache@0
   inputs:
     key: |
@@ -43,5 +43,6 @@ steps:
       $(Agent.OS)
       $(Agent.JobName)
       $(DOCKER_ROOT)
+      $(DOCKER_CACHE_FOLDER)
       TIMES_I_MESSED_UP = 0
-    path: $(DOCKER_ROOT)
+    path: $(DOCKER_CACHE_FOLDER)
