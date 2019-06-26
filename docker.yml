@@ -65,7 +65,6 @@ steps:
     sudo make install
     which buildctl
     which buildkitd
-    sudo buildkitd --debug --root /var/lib/buildkit &
 
 - task: RestoreCache@0
   inputs:
@@ -88,9 +87,9 @@ steps:
 #   condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
 
 - script: |
+    sudo buildkitd --debug --root /var/lib/buildkit &
     buildctl du -v
-
-- script: $(DOCKER_COMMAND)
+    $(DOCKER_COMMAND)
   displayName: 'docker build'
 
 # - task: SaveCache@0
