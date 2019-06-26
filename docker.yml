@@ -8,13 +8,10 @@ pool:
 
 variables:
   DOCKER_BUILDKIT: 1
-  imageName: 'your-container-image-name'
   system.debug: 'true'
   agent.diagnostic: 'true'
-  DOCKER_FOLDER: '/var/lib/docker'
-  DOCKER_FOLDER_TAR_FOLDER: '$(Pipeline.Workspace)/dockercache'
-  DOCKER_FOLDER_TAR: '$(DOCKER_FOLDER_TAR_FOLDER)/docker.tar'
-  DOCKER_COMMAND: 'docker build --rm=false -f Dockerfile -t $(imageName) .'
+  BUILD_KIT_CACHE: '$(Pipeline.Workspace)/buildkitcache'
+  DOCKER_COMMAND: 'buildctl build --frontend=dockerfile.v0 --local context=. --local dockerfile=. --export-cache type=local,dest=$(BUILD_KIT_CACHE)'
   TAR_COMMAND: 'tar -cf $(DOCKER_FOLDER_TAR) --absolute-names $(DOCKER_FOLDER)'
   TIMES_I_MESSED_UP: 10
   CACHE_KEY_BASE: |
@@ -33,13 +30,38 @@ variables:
   # CACHE_KEY_FALLBACK: |
   #   $(CACHE_KEY_BASE)
   #   $(CACHE_FALLBACK_COMMIT_FILE)
+  BUILDKIT_COMMIT: 646fc0af6d283397b9e47cd0a18779e9d0376e0e
+  BUILDKIT_CACHE_KEY: |
+    buildkit
+    $(BUILDKIT_COMMIT)
+    GOOFS=0
 
 steps:
 - task: RestoreCache@0
   inputs:
+    key: $(BUILDKIT_CACHE_KEY)
+    path: '$(System.DefaultWorkingDirectory)/buildkit'
+    cacheHitVar: 'BuildKitToolHit'
+  displayName: 'Look for exact hit'
+- script: |
+    git clone https://github.com/moby/buildkit.git
+    cd buildkit
+    git checkout $(BUILDKIT_COMMIT)
+    make && sudo make install
+    which buildctl
+  displayName: "Build BuildKit"
+  condition: and(succeeded(), ne(variables['PipelineCache.BuildKitToolHit'], 'True'))
+- task: SaveCache@0
+  inputs:
+    key: $(BUILDKIT_CACHE_KEY)
+    path: '$(System.DefaultWorkingDirectory)/buildkit'
+  condition: and(and(succeeded(), ne(variables['PipelineCache.BuildKitToolHit'], 'True')), eq(variables['Build.SourceBranchName'], 'master'))
+  
+- task: RestoreCache@0
+  inputs:
     key: $(CACHE_KEY_EXACT)
-    path: '$(DOCKER_FOLDER_TAR_FOLDER)'
-    cacheHitVar: 'DockerCacheHitExact'
+    path: '$(BUILD_KIT_CACHE)'
+    cacheHitVar: 'BuildKitCacheHit'
   displayName: 'Look for exact hit'
 
 # - script: |
@@ -55,32 +77,8 @@ steps:
 #   displayName: 'Look for inexact hit'
 #   condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
 
-- script: |
-    docker images --all
-    sudo service docker stop
-    if [ -f "$DOCKER_FOLDER_TAR" ]; then
-        sudo tar -xf $(DOCKER_FOLDER_TAR) --absolute-names $(DOCKER_FOLDER)
-    else
-        sudo rm -Rf $(DOCKER_FOLDER)
-    fi
-    sudo service docker start
-    docker images --all
-  displayName: 'Extract TAR if we have one; otherwise clear things out'
-
 - script: $(DOCKER_COMMAND)
   displayName: 'docker build'
-
-- script: docker images --all
-  displayName: Dump images  
-
-- script: |
-    sudo service docker stop
-    mkdir $(DOCKER_FOLDER_TAR_FOLDER)
-    sudo $(TAR_COMMAND)
-  condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
-  # condition: and(succeeded(), or(ne(variables['PipelineCache.DockerCacheHitExact'], 'True'),ne(variables['PipelineCache.DockerCacheHitFallback'], 'True')))
-  displayName: 'TAR up the docker folder'
-  
 
 # - task: SaveCache@0
 #   inputs:
@@ -90,6 +88,6 @@ steps:
 - task: SaveCache@0
   inputs:
     key: $(CACHE_KEY_EXACT)
-    path: '$(DOCKER_FOLDER_TAR_FOLDER)'
-  condition: and(and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True')), eq(variables['Build.SourceBranchName'], 'master'))
+    path: '$(BUILD_KIT_CACHE)'
+  condition: and(and(succeeded(), ne(variables['PipelineCache.BuildKitCacheHit'], 'True')), eq(variables['Build.SourceBranchName'], 'master'))
   
