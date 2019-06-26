@@ -15,40 +15,55 @@ variables:
   DOCKER_FOLDER_TAR: '$(DOCKER_FOLDER_TAR_FOLDER)/docker.tar'
   DOCKER_COMMAND: 'docker build --rm=false -f Dockerfile -t $(imageName) .'
   TAR_COMMAND: 'tar -cf $(DOCKER_FOLDER_TAR) --absolute-names $(DOCKER_FOLDER)'
-  TIMES_I_MESSED_UP: 7
+  TIMES_I_MESSED_UP: 8
+  CACHE_KEY_BASE: |
+    $(Agent.OS) $(Agent.JobName)
+    DOCKER_FILE = $(DOCKER_FILE)
+    $(DOCKER_FOLDER)
+    $(DOCKER_COMMAND)
+    $(TAR_COMMAND)
+    tar file is $(DOCKER_FOLDER_TAR)
+    TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
+  CACHE_KEY_EXACT: |
+    $(CACHE_KEY_BASE)
+    $(System.DefaultWorkingDirectory)/Dockerfile
+  CACHE_FALLBACK_COMMIT_FILE: $(Pipeline.Workspace)/common_commit.txt
+  CACHE_KEY_FALLBACK: |
+    $(CACHE_KEY_BASE)
+    $(CACHE_FALLBACK_COMMIT_FILE)
 
 steps:
-- script: |
-    ls $(System.DefaultWorkingDirectory)/Dockerfile
-    cat $(System.DefaultWorkingDirectory)/Dockerfile
 - task: RestoreCache@0
   inputs:
-    key: |
-      $(System.DefaultWorkingDirectory)/Dockerfile
-      $(Agent.OS) $(Agent.JobName)
-      DOCKER_FILE = $(DOCKER_FILE)
-      $(DOCKER_FOLDER)
-      $(DOCKER_COMMAND)
-      $(TAR_COMMAND)
-      tar file is $(DOCKER_FOLDER_TAR)
-      TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
+    key: $(CACHE_KEY_EXACT)
     path: '$(DOCKER_FOLDER_TAR_FOLDER)'
-    cacheHitVar: 'DockerCacheHit'
+    cacheHitVar: 'DockerCacheHitExact'
+  displayName: 'Look for exact hit'
+
+- script: |
+    git merge-base -a origin/master HEAD > $(CACHE_FALLBACK_COMMIT_FILE)
+  condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
+
+- task: RestoreCache@0
+  inputs:
+    key: $(CACHE_KEY_FALLBACK)
+    path: '$(DOCKER_FOLDER_TAR_FOLDER)'
+    cacheHitVar: 'DockerCacheHitFallback'
+  displayName: 'Look for inexact hit'
+  condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
+
 - script: |
     docker images --all
-    sudo service docker stop
-    sudo tar -xf $(DOCKER_FOLDER_TAR) --absolute-names $(DOCKER_FOLDER)
-    sudo service docker start
-  condition: and(succeeded(), eq(variables['PipelineCache.DockerCacheHit'], 'True'))
-
-- script: |
-    docker rmi $(docker images -a -q)
-    docker system prune --all --force
-  condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHit'], 'True'))
-  displayName: clear out existing images (hack)
-
-- script: docker images --all
-  displayName: Dump images
+    if [ -f "$DOCKER_FOLDER_TAR" ]; then
+        sudo service docker stop
+        sudo tar -xf $(DOCKER_FOLDER_TAR) --absolute-names $(DOCKER_FOLDER)
+        sudo service docker start
+    else
+        docker rmi $(docker images -a -q)
+        docker system prune --all --force
+    fi
+    docker images --all
+  displayName: 'Extract TAR if we have one; otherwise clear things out'
 
 - script: $(DOCKER_COMMAND)
   displayName: 'docker build'
@@ -60,19 +75,18 @@ steps:
     sudo service docker stop
     mkdir $(DOCKER_FOLDER_TAR_FOLDER)
     sudo $(TAR_COMMAND)
-  condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHit'], 'True'))
+  condition: and(succeeded(), or(ne(variables['PipelineCache.DockerCacheHitExact'], 'True'),ne(variables['PipelineCache.DockerCacheHitFallback'], 'True')))
+  displayName: 'TAR up the docker folder'
   
+
 - task: SaveCache@0
   inputs:
-    key: |
-      $(System.DefaultWorkingDirectory)/Dockerfile
-      $(Agent.OS) $(Agent.JobName)
-      DOCKER_FILE = $(DOCKER_FILE)
-      $(DOCKER_FOLDER)
-      $(DOCKER_COMMAND)
-      $(TAR_COMMAND)
-      tar file is $(DOCKER_FOLDER_TAR)
-      TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
-    path: $(DOCKER_FOLDER_TAR_FOLDER)
-  condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHit'], 'True'))
+    key: $(CACHE_KEY_FALLBACK)
+    path: '$(DOCKER_FOLDER_TAR_FOLDER)'
+  condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitFallback'], 'True'))
+- task: SaveCache@0
+  inputs:
+    key: $(CACHE_KEY_EXACT)
+    path: '$(DOCKER_FOLDER_TAR_FOLDER)'
+  condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
   
