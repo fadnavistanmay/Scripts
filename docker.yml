@@ -11,14 +11,12 @@ variables:
   system.debug: 'true'
   agent.diagnostic: 'true'
   DOCKER_FOLDER: '/var/lib/docker'
+  DOCKER_FOLDER_TAR_FOLDER: '$(Pipeline.Workspace)/dockercache'
+  DOCKER_FOLDER_TAR: '$(DOCKER_FOLDER_TAR_FOLDER)/docker.tar'
   DOCKER_COMMAND: 'docker build --rm=false -f Dockerfile -t $(imageName) .'
   TIMES_I_MESSED_UP: 5
 
 steps:
-- script: |
-    sudo service docker stop
-    sudo chmod -R 0777 $(DOCKER_FOLDER)
-    du $(DOCKER_FOLDER)
 - task: RestoreCache@0
   inputs:
     key: |
@@ -27,10 +25,17 @@ steps:
       DOCKER_FILE = $(DOCKER_FILE)
       $(DOCKER_FOLDER)
       $(DOCKER_COMMAND)
+      tar file is $(DOCKER_FOLDER_TAR)
       TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
-    path: '$(DOCKER_FOLDER)'
+    path: '$(DOCKER_FOLDER_TAR_FOLDER)'
     cacheHitVar: 'DockerCacheHit'
-- script: sudo service docker start
+- script: |
+    docker images --all
+    sudo service docker stop
+    sudo tar -xf $(DOCKER_FOLDER_TAR) $(DOCKER_FOLDER)
+    sudo service docker start
+  condition: and(succeeded(), eq(variables['PipelineCache.DockerCacheHit'], 'True'))
+
 - script: docker images --all
   displayName: Dump images
 
@@ -42,9 +47,10 @@ steps:
 
 - script: |
     sudo service docker stop
-    sudo chmod -R 0777 $(DOCKER_FOLDER)
-    du $(DOCKER_FOLDER)
-
+    mkdir $(DOCKER_FOLDER_TAR_FOLDER)
+    sudo tar -cf $(DOCKER_FOLDER_TAR) $(DOCKER_FOLDER)
+  condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHit'], 'True'))
+  
 - task: SaveCache@0
   inputs:
     key: |
@@ -53,7 +59,8 @@ steps:
       DOCKER_FILE = $(DOCKER_FILE)
       $(DOCKER_FOLDER)
       $(DOCKER_COMMAND)
+      tar file is $(DOCKER_FOLDER_TAR)
       TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
-    path: $(DOCKER_FOLDER)
+    path: $(DOCKER_FOLDER_TAR_FOLDER)
   condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHit'], 'True'))
   
