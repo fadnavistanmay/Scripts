@@ -7,7 +7,7 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 variables:
-  imageName: 'your-container-image-name:$(build.buildId)'
+  imageName: 'your-container-image-name'
   system.debug: true
   agent.diagnostic: true
   DOCKER_FOLDER: $(System.DefaultWorkingDirectory)/dockercache
@@ -15,7 +15,7 @@ variables:
   TIMES_I_MESSED_UP: 4
 
 steps:
-- task: Cache@0
+- task: RestoreCache@0
   inputs:
     key: |
       $(System.DefaultWorkingDirectory)/DockerFile
@@ -23,6 +23,7 @@ steps:
       $(Agent.JobName)
       $(DOCKER_ROOT)
       $(DOCKER_CACHE_FOLDER)
+      $(imageName)
       TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
     path: '$(DOCKER_FOLDER)'
 - script: docker images --all
@@ -46,5 +47,6 @@ steps:
       $(Agent.JobName)
       $(DOCKER_ROOT)
       $(DOCKER_CACHE_FOLDER)
+      $(imageName)
       TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
     path: $(DOCKER_FOLDER)
