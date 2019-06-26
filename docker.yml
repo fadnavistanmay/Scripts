@@ -34,7 +34,7 @@ steps:
 - script: |
     docker images --all
     sudo service docker stop
-    sudo tar -xf $(DOCKER_FOLDER_TAR) $(DOCKER_FOLDER)
+    sudo tar -xf $(DOCKER_FOLDER_TAR) --absolute-names $(DOCKER_FOLDER)
     sudo service docker start
   condition: and(succeeded(), eq(variables['PipelineCache.DockerCacheHit'], 'True'))
 
