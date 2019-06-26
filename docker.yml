@@ -65,7 +65,7 @@ steps:
 - task: SaveCache@0
   inputs:
     key: |
-      $(System.DefaultWorkingDirectory)/DockerFile
+      $(System.DefaultWorkingDirectory)/Dockerfile
       $(Agent.OS) $(Agent.JobName)
       DOCKER_FILE = $(DOCKER_FILE)
       $(DOCKER_FOLDER)
