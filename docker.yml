@@ -19,7 +19,7 @@ variables:
     $(BUILDKIT_COMMIT)
     GOOFS=0
 
-  DOCKER_COMMAND: 'buildctl build --frontend=dockerfile.v0 --local context=. --local dockerfile=. --import-cache type=local,dest=$(BUILD_KIT_CACHE) --export-cache type=local,dest=$(BUILD_KIT_CACHE)'
+  DOCKER_COMMAND: 'buildctl build --frontend=dockerfile.v0 --local context=. --local dockerfile=. --export-cache type=local,dest=$(BUILD_KIT_CACHE)'
   TAR_COMMAND: 'tar -cf $(DOCKER_FOLDER_TAR) --absolute-names $(DOCKER_FOLDER)'
   TIMES_I_MESSED_UP: 10
   CACHE_KEY_BASE: |
@@ -91,7 +91,11 @@ steps:
     sudo buildkitd --debug --root /var/lib/buildkit &
     sleep 10
     sudo buildctl du -v
-    sudo $(DOCKER_COMMAND)
+    if [ -d "$(BUILD_KIT_CACHE)" ]; then
+        sudo $(DOCKER_COMMAND) --import-cache type=local,dest=$(BUILD_KIT_CACHE)
+    else 
+        sudo $(DOCKER_COMMAND)
+    fi
   displayName: 'docker build'
 
 # - task: SaveCache@0
