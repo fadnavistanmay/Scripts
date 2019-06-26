@@ -42,7 +42,8 @@ steps:
 
 - script: |
     git merge-base -a origin/master HEAD > $(CACHE_FALLBACK_COMMIT_FILE)
-  condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
+    cat $(CACHE_FALLBACK_COMMIT_FILE)
+  # condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
 
 - task: RestoreCache@0
   inputs:
