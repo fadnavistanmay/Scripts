@@ -13,4 +13,4 @@ ADD src/* /src/
 
 RUN cargo build
 
-# RUN cargo build --release
+RUN cargo build --release
