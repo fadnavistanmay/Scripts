@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:2.7-slim
+FROM rust:1.31
 
 # Set the working directory to /app
 WORKDIR /app

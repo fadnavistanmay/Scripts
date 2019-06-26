@@ -12,7 +12,7 @@ variables:
   agent.diagnostic: true
   DOCKER_FOLDER: $(Pipeline.Workspace)/dockercache
   DOCKER_FILE: $(DOCKER_FOLDER)/images
-  IMAGES: '$(imageName) python:2.7-slim'
+  IMAGES: '$(imageName) rust:1.31'
   TIMES_I_MESSED_UP: 5
 
 steps:
@@ -27,19 +27,26 @@ steps:
       $(IMAGES)
       TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
     path: '$(DOCKER_FOLDER)'
-- script: docker images --all
-  displayName: Dump images
+    cacheHitVar: 'DockerCacheHit'
+# - script: docker images --all
+#   displayName: Dump images
+
 - script: |
     if [[ -f $(DOCKER_FILE) ]]; then docker load -i $(DOCKER_FILE) ; fi
-- script: docker images --all
-  displayName: Dump images
+  condition: and(succeeded(), eq(variables['PipelineCache.DockerCacheHit'], 'True'))
+  
+# - script: docker images --all
+#   displayName: Dump images
+
 - script: docker build -f Dockerfile -t $(imageName) .
   displayName: 'docker build'
-- script: docker images --all
-  displayName: Dump images  
+# - script: docker images --all
+#   displayName: Dump images  
+
 - script: |
     mkdir $(DOCKER_FOLDER)
     docker save -o $(DOCKER_FILE) $(IMAGES)
+  condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHit'], 'True'))
 - task: SaveCache@0
   inputs:
     key: |
@@ -51,3 +58,5 @@ steps:
       $(IMAGES)
       TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
     path: $(DOCKER_FOLDER)
+  condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHit'], 'True'))
+  
