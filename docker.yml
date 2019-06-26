@@ -18,6 +18,9 @@ variables:
   TIMES_I_MESSED_UP: 7
 
 steps:
+- script: |
+    ls $(System.DefaultWorkingDirectory)/DockerFile
+    cat $(System.DefaultWorkingDirectory)/DockerFile
 - task: RestoreCache@0
   inputs:
     key: |
