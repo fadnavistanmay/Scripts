@@ -13,7 +13,9 @@ variables:
   DOCKER_ROOT: /var/lib/docker/image/overlay2/imagedb
 
 steps:
-- script: sudo chmod -R 777 '$(DOCKER_ROOT)'
+- script: |
+    sudo chmod -v -R 777 $(DOCKER_ROOT)
+    ls -l $(DOCKER_ROOT)
 - task: RestoreCache@0
   inputs:
     key: |
@@ -24,12 +26,14 @@ steps:
       TIMES_I_MESSED_UP = 0
     path: $(DOCKER_ROOT)
 - script: docker images --all
-# - script: sudo ls -l /var/lib/docker/image/overlay2/imagedb
+# - script: 
 - script: docker build -f Dockerfile -t $(imageName) .
   displayName: 'docker build'
 - script: docker images --all
 # - script: sudo ls -l /var/lib/docker/image/overlay2/imagedb
-- script: sudo chmod -R 777 '$(DOCKER_ROOT)'
+- script: |
+    sudo chmod -v -R 777 $(DOCKER_ROOT)
+    ls -l $(DOCKER_ROOT)
 - task: SaveCache@0
   inputs:
     key: |
