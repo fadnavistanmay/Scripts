@@ -18,7 +18,7 @@ steps:
 - script: |
     sudo service docker stop
     sudo chmod -R 0777 $(DOCKER_FOLDER)
-    tree $(DOCKER_FOLDER)
+    du $(DOCKER_FOLDER)
 - task: RestoreCache@0
   inputs:
     key: |
@@ -43,7 +43,7 @@ steps:
 - script: |
     sudo service docker stop
     sudo chmod -R 0777 $(DOCKER_FOLDER)
-    tree $(DOCKER_FOLDER)
+    du $(DOCKER_FOLDER)
 
 - task: SaveCache@0
   inputs:
