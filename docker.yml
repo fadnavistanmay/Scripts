@@ -10,7 +10,7 @@ variables:
   imageName: 'your-container-image-name'
   system.debug: true
   agent.diagnostic: true
-  DOCKER_FOLDER: $(System.DefaultWorkingDirectory)/dockercache
+  DOCKER_FOLDER: $(Pipeline.Workspace)/dockercache
   DOCKER_FILE: $(DOCKER_FOLDER)/$(imageName)
   TIMES_I_MESSED_UP: 4
 
