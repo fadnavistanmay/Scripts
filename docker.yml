@@ -11,8 +11,8 @@ variables:
   system.debug: true
   agent.diagnostic: true
   DOCKER_ROOT: /var/lib/docker
-  DOCKER_CACHE_FOLDER: /var/lib/docker/image/overlay2/imagedb
-  TIMES_I_MESSED_UP: 1
+  DOCKER_CACHE_FOLDER: /var/lib/docker
+  TIMES_I_MESSED_UP: 2
 
 steps:
 - script: |
@@ -35,7 +35,6 @@ steps:
 - script: docker build -f Dockerfile -t $(imageName) .
   displayName: 'docker build'
 - script: docker images --all
-# - script: sudo ls -l /var/lib/docker/image/overlay2/imagedb
 - script: |
     sudo chmod -c -R 777 $(DOCKER_ROOT)
     ls -l $(DOCKER_CACHE_FOLDER)
