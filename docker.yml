@@ -4,7 +4,8 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 pool:
-  vmImage: 'Ubuntu 16.04'
+  # vmImage: 'Ubuntu 16.04'
+  name: 'jericksurface'
 
 variables:
   imageName: 'your-container-image-name:$(build.buildId)'
@@ -15,28 +16,27 @@ variables:
   TIMES_I_MESSED_UP: 3
 
 steps:
-- script: |
-    sudo chmod -c -R 777 $(DOCKER_ROOT)
-    ls -l $(DOCKER_CACHE_FOLDER)
-    ls -ld $(find $(DOCKER_CACHE_FOLDER))
-    tree $(DOCKER_ROOT)
-- task: Cache@0
-  inputs:
-    key: |
-      $(System.DefaultWorkingDirectory)/DockerFile
-      $(Agent.OS)
-      $(Agent.JobName)
-      $(DOCKER_ROOT)
-      $(DOCKER_CACHE_FOLDER)
-      TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
-    path: '$(DOCKER_CACHE_FOLDER)'
+# - script: |
+#     sudo chmod -c -R 777 $(DOCKER_ROOT)
+#     ls -l $(DOCKER_CACHE_FOLDER)
+#     ls -ld $(find $(DOCKER_CACHE_FOLDER))
+#     tree $(DOCKER_ROOT)
+# - task: Cache@0
+#   inputs:
+#     key: |
+#       $(System.DefaultWorkingDirectory)/DockerFile
+#       $(Agent.OS)
+#       $(Agent.JobName)
+#       $(DOCKER_ROOT)
+#       $(DOCKER_CACHE_FOLDER)
+#       TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
+#     path: '$(DOCKER_CACHE_FOLDER)'
 - script: docker images --all
-# - script: 
 - script: docker build -f Dockerfile -t $(imageName) .
   displayName: 'docker build'
 - script: docker images --all
-- script: |
-    sudo chmod -c -R 777 $(DOCKER_ROOT)
-    ls -l $(DOCKER_CACHE_FOLDER)
-    ls -ld $(find $(DOCKER_CACHE_FOLDER))
-    tree $(DOCKER_ROOT)
+# - script: |
+#     sudo chmod -c -R 777 $(DOCKER_ROOT)
+#     ls -l $(DOCKER_CACHE_FOLDER)
+#     ls -ld $(find $(DOCKER_CACHE_FOLDER))
+#     tree $(DOCKER_ROOT)
