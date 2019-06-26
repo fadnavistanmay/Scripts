@@ -13,8 +13,7 @@ variables:
   DOCKER_ROOT: /var/lib/docker
 
 steps:
-- script: |
-    sudo chmod -R 777 '$(DOCKER_ROOT)'
+- script: sudo chmod -R 777 '$(DOCKER_ROOT)'
 - task: RestoreCache@0
   inputs:
     key: |
@@ -30,6 +29,7 @@ steps:
   displayName: 'docker build'
 - script: docker images --all
 # - script: sudo ls -l /var/lib/docker/image/overlay2/imagedb
+- script: sudo chmod -R 777 '$(DOCKER_ROOT)'
 - task: SaveCache@0
   inputs:
     key: |
