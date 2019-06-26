@@ -100,7 +100,8 @@ steps:
       DOCKER_COMMAND="$DOCKER_COMMAND --import-cache type=local,src=$BUILD_KIT_CACHE"
     fi
 
-    if [ "$(PipelineCache.BuildKitCacheHit)" != "True" ]; then 
+    CACHE_HIT=$(PipelineCache.BuildKitCacheHit)
+    if [ "$CACHE_HIT" != "True" ]; then 
       DOCKER_COMMAND="$DOCKER_COMMAND --export-cache type=local,dest=$(BUILD_KIT_CACHE)"
     fi
 
