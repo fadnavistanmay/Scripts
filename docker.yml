@@ -12,7 +12,7 @@ variables:
   agent.diagnostic: true
   DOCKER_FOLDER: $(Pipeline.Workspace)/dockercache
   DOCKER_FILE: $(DOCKER_FOLDER)/images
-  IMAGES: '$(imageName)'
+  IMAGES: '$(imageName) python:2.7-slim'
   TIMES_I_MESSED_UP: 5
 
 steps:
