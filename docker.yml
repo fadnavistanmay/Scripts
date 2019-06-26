@@ -12,11 +12,13 @@ variables:
   agent.diagnostic: true
   DOCKER_ROOT: /var/lib/docker
   DOCKER_CACHE_FOLDER: /var/lib/docker/image/overlay2/imagedb
+  TIMES_I_MESSED_UP: 1
 
 steps:
 - script: |
-    sudo chmod -R 777 $(DOCKER_ROOT)
+    sudo chmod -c -R 777 $(DOCKER_ROOT)
     ls -l $(DOCKER_CACHE_FOLDER)
+    ls -ld $(find $(DOCKER_CACHE_FOLDER))
 - task: RestoreCache@0
   inputs:
     key: |
@@ -25,7 +27,7 @@ steps:
       $(Agent.JobName)
       $(DOCKER_ROOT)
       $(DOCKER_CACHE_FOLDER)
-      TIMES_I_MESSED_UP = 0
+      TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
     path: $(DOCKER_CACHE_FOLDER)
 - script: docker images --all
 # - script: 
@@ -34,8 +36,9 @@ steps:
 - script: docker images --all
 # - script: sudo ls -l /var/lib/docker/image/overlay2/imagedb
 - script: |
-    sudo chmod -v -R 777 $(DOCKER_ROOT)
+    sudo chmod -c -R 777 $(DOCKER_ROOT)
     ls -l $(DOCKER_CACHE_FOLDER)
+    ls -ld $(find $(DOCKER_CACHE_FOLDER))
 - task: SaveCache@0
   inputs:
     key: |
@@ -44,5 +47,5 @@ steps:
       $(Agent.JobName)
       $(DOCKER_ROOT)
       $(DOCKER_CACHE_FOLDER)
-      TIMES_I_MESSED_UP = 0
+      TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
     path: $(DOCKER_CACHE_FOLDER)
