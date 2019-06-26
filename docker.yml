@@ -14,7 +14,8 @@ variables:
 
 steps:
 - script: |
-    sudo chmod -v -R 777 $(DOCKER_ROOT)/..
+    sudo chown -v -R me $(DOCKER_ROOT)
+    sudo chmod -v -R 777 $(DOCKER_ROOT)
     ls -l $(DOCKER_ROOT)
 - task: RestoreCache@0
   inputs:
@@ -32,7 +33,8 @@ steps:
 - script: docker images --all
 # - script: sudo ls -l /var/lib/docker/image/overlay2/imagedb
 - script: |
-    sudo chmod -v -R 777 $(DOCKER_ROOT)/..
+    sudo chown -v -R me $(DOCKER_ROOT)
+    sudo chmod -v -R 777 $(DOCKER_ROOT)
     ls -l $(DOCKER_ROOT)
 - task: SaveCache@0
   inputs:
