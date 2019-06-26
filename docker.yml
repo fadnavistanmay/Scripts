@@ -19,12 +19,12 @@ variables:
 
 steps:
 - script: |
-    ls $(System.DefaultWorkingDirectory)/DockerFile
-    cat $(System.DefaultWorkingDirectory)/DockerFile
+    ls $(System.DefaultWorkingDirectory)/Dockerfile
+    cat $(System.DefaultWorkingDirectory)/Dockerfile
 - task: RestoreCache@0
   inputs:
     key: |
-      $(System.DefaultWorkingDirectory)/DockerFile
+      $(System.DefaultWorkingDirectory)/Dockerfile
       $(Agent.OS) $(Agent.JobName)
       DOCKER_FILE = $(DOCKER_FILE)
       $(DOCKER_FOLDER)
