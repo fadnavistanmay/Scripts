@@ -90,7 +90,7 @@ steps:
     set -e -x
     sudo buildkitd --debug --root /var/lib/buildkit &
     
-    until buildctl du -v
+    until sudo buildctl du -v
     do
       echo "Waiting for daemon to load"
       sleep 1
