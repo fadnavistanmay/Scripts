@@ -12,7 +12,7 @@ variables:
   agent.diagnostic: true
   DOCKER_FOLDER: $(Pipeline.Workspace)/dockercache
   DOCKER_FILE: $(DOCKER_FOLDER)/images
-  IMAGES: '$(your-container-image-name)'
+  IMAGES: '$(imageName)'
   TIMES_I_MESSED_UP: 5
 
 steps:
