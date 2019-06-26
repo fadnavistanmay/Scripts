@@ -21,7 +21,7 @@ variables:
 
   DOCKER_COMMAND: 'buildctl build --frontend=dockerfile.v0 --local context=. --local dockerfile=. --export-cache type=local,dest=$(BUILD_KIT_CACHE)'
   TAR_COMMAND: 'tar -cf $(DOCKER_FOLDER_TAR) --absolute-names $(DOCKER_FOLDER)'
-  TIMES_I_MESSED_UP: 10
+  TIMES_I_MESSED_UP: 11
   CACHE_KEY_BASE: |
     $(Agent.OS) $(Agent.JobName)
     DOCKER_FILE = $(DOCKER_FILE)
@@ -101,6 +101,7 @@ steps:
     else 
         sudo $(DOCKER_COMMAND)
     fi
+    sudo kill -9 $(jobs -p)
   displayName: 'docker build'
 
 # - task: SaveCache@0
