@@ -88,6 +88,7 @@ steps:
 
 - script: |
     sudo buildkitd --debug --root /var/lib/buildkit &
+    sleep 5
     buildctl du -v
     $(DOCKER_COMMAND)
   displayName: 'docker build'
