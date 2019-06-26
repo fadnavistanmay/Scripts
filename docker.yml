@@ -92,7 +92,7 @@ steps:
     sudo buildctl du -v
     ls $(BUILD_KIT_CACHE)
     if [ -d "$(BUILD_KIT_CACHE)" ]; then
-        sudo $(DOCKER_COMMAND) --import-cache type=local,dest=$(BUILD_KIT_CACHE)
+        sudo $(DOCKER_COMMAND) --import-cache type=local,src=$(BUILD_KIT_CACHE)
     else 
         sudo $(DOCKER_COMMAND)
     fi
