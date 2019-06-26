@@ -34,6 +34,7 @@ steps:
 - script: docker images --all
   displayName: Dump images  
 - script: |
+    mkdir $(DOCKER_FOLDER)
     docker save ${imageName} | gzip -c > ${DOCKER_FILE}
 - task: SaveCache@0
   inputs:
