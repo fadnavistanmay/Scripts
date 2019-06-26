@@ -20,26 +20,23 @@ variables:
     GOOFS=0
 
   DOCKER_COMMAND: 'buildctl build --frontend=dockerfile.v0 --local context=. --local dockerfile=.'
-  TAR_COMMAND: 'tar -cf $(DOCKER_FOLDER_TAR) --absolute-names $(DOCKER_FOLDER)'
   TIMES_I_MESSED_UP: 11
   CACHE_KEY_BASE: |
     $(Agent.OS) $(Agent.JobName)
-    DOCKER_FILE = $(DOCKER_FILE)
-    $(DOCKER_FOLDER)
     $(DOCKER_COMMAND)
-    $(TAR_COMMAND)
     DOCKER_BUILDKIT=$(DOCKER_BUILDKIT)
-    tar file is $(DOCKER_FOLDER_TAR)
-    TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
+    TIMES_I_MESSED_UP=$(TIMES_I_MESSED_UP)
   CACHE_KEY_EXACT: |
     $(CACHE_KEY_BASE)
     $(System.DefaultWorkingDirectory)/Dockerfile
-  # CACHE_FALLBACK_COMMIT_FILE: $(Pipeline.Workspace)/common_commit.txt
-  # CACHE_KEY_FALLBACK: |
-  #   $(CACHE_KEY_BASE)
-  #   $(CACHE_FALLBACK_COMMIT_FILE)
+  CACHE_FALLBACK_COMMIT_FILE: $(Pipeline.Workspace)/common_commit.txt
+  CACHE_KEY_FALLBACK: |
+    $(CACHE_KEY_BASE)
+    $(CACHE_FALLBACK_COMMIT_FILE)
 
 steps:
+
+# Build/restore the BuildKit tool 
 - task: RestoreCache@0
   inputs:
     key: $(BUILDKIT_CACHE_KEY)
@@ -59,36 +56,36 @@ steps:
     key: $(BUILDKIT_CACHE_KEY)
     path: '$(System.DefaultWorkingDirectory)/buildkit'
   condition: and(and(succeeded(), ne(variables['PipelineCache.BuildKitToolHit'], 'True')), eq(variables['Build.SourceBranchName'], 'master'))
-
 - script: |
     cd buildkit
     sudo make install
     which buildctl
     which buildkitd
 
+# restore the BuildKit cache based on the Dockerfile ...
 - task: RestoreCache@0
   inputs:
     key: $(CACHE_KEY_EXACT)
     path: '$(BUILD_KIT_CACHE)'
     cacheHitVar: 'BuildKitCacheHit'
   displayName: 'Look for exact hit'
-
-# - script: |
-#     git merge-base -a origin/master HEAD > $(CACHE_FALLBACK_COMMIT_FILE)
-#     cat $(CACHE_FALLBACK_COMMIT_FILE)
-#   # condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
-
-# - task: RestoreCache@0
-#   inputs:
-#     key: $(CACHE_KEY_FALLBACK)
-#     path: '$(DOCKER_FOLDER_TAR_FOLDER)'
-#     cacheHitVar: 'DockerCacheHitFallback'
-#   displayName: 'Look for inexact hit'
-#   condition: and(succeeded(), ne(variables['PipelineCache.DockerCacheHitExact'], 'True'))
-
 - script: |
+    echo "Temporary workaround"
     echo "##vso[task.setvariable variable=CACHE_HIT;]True"
   condition: and(succeeded(), eq(variables['PipelineCache.BuildKitCacheHit'], 'True'))
+
+# ... or based on the common commit ID of master (which has a CI) and this branch
+- script: |
+    git merge-base -a origin/master HEAD > $(CACHE_FALLBACK_COMMIT_FILE)
+    cat $(CACHE_FALLBACK_COMMIT_FILE)
+  # condition: and(succeeded(), ne(variables['PipelineCache.BuildKitCacheHit'], 'True'))
+- task: RestoreCache@0
+  inputs:
+    key: $(CACHE_KEY_FALLBACK)
+    path: '$(BUILD_KIT_CACHE)'
+    cacheHitVar: 'BuildKitFallbackHit'
+  displayName: 'Look for inexact hit'
+  condition: and(succeeded(), ne(variables['PipelineCache.BuildKitCacheHit'], 'True'))
 
 - script: |
     set -e -x
@@ -115,11 +112,11 @@ steps:
     sudo kill -9 $(jobs -p)
   displayName: 'docker build'
 
-# - task: SaveCache@0
-#   inputs:
-#     key: $(CACHE_KEY_FALLBACK)
-#     path: '$(DOCKER_FOLDER_TAR_FOLDER)'
-#   condition: and(and(succeeded(), ne(variables['PipelineCache.DockerCacheHitFallback'], 'True')), eq(variables['Build.SourceBranchName'], 'master'))
+- task: SaveCache@0
+  inputs:
+    key: $(CACHE_KEY_FALLBACK)
+    path: '$(BUILD_KIT_CACHE)'
+  condition: and(and(succeeded(), ne(variables['PipelineCache.DockerCacheHitFallback'], 'True')), eq(variables['Build.SourceBranchName'], 'master'))
 - task: SaveCache@0
   inputs:
     key: $(CACHE_KEY_EXACT)
