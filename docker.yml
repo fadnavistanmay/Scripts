@@ -8,10 +8,11 @@ pool:
 
 variables:
   imageName: 'your-container-image-name'
-  system.debug: true
-  agent.diagnostic: true
+  system.debug: false
+  agent.diagnostic: false
   DOCKER_FOLDER: $(Pipeline.Workspace)/dockercache
-  DOCKER_FILE: $(DOCKER_FOLDER)/$(imageName)
+  DOCKER_FILE: $(DOCKER_FOLDER)/images
+  IMAGES: $(your-container-image-name)
   TIMES_I_MESSED_UP: 4
 
 steps:
@@ -23,12 +24,13 @@ steps:
       $(Agent.JobName)
       DOCKER_FILE = $(DOCKER_FILE)
       $(imageName)
+      $(IMAGES)
       TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
     path: '$(DOCKER_FOLDER)'
 - script: docker images --all
   displayName: Dump images
 - script: |
-    if [[ -f $(DOCKER_FILE) ]]; then docker load -i $(DOCKER_FILE); fi
+    if [[ -f $(DOCKER_FILE) ]]; then docker load -i $(DOCKER_FILE) ; fi
 - script: docker images --all
   displayName: Dump images
 - script: docker build -f Dockerfile -t $(imageName) .
@@ -37,7 +39,7 @@ steps:
   displayName: Dump images  
 - script: |
     mkdir $(DOCKER_FOLDER)
-    docker save $(imageName) | gzip -c > $(DOCKER_FILE)
+    docker save $(IMAGES) > $(DOCKER_FILE)
 - task: SaveCache@0
   inputs:
     key: |
@@ -46,5 +48,6 @@ steps:
       $(Agent.JobName)
       DOCKER_FILE = $(DOCKER_FILE)
       $(imageName)
+      $(IMAGES)
       TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
     path: $(DOCKER_FOLDER)
