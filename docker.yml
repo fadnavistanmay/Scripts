@@ -100,8 +100,8 @@ steps:
       sleep 1
     done
 
-    DOCKER_COMMAND=$(DOCKER_COMMAND)
-    
+    DOCKER_COMMAND="$(DOCKER_COMMAND)"
+
     if [ -d "$(BUILD_KIT_CACHE)" ]; then
       DOCKER_COMMAND="$DOCKER_COMMAND --import-cache type=local,src=$(BUILD_KIT_CACHE)"
     fi
