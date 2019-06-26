@@ -99,16 +99,18 @@ steps:
       echo "Waiting for daemon to load"
       sleep 1
     done
+
+    DOCKER_COMMAND=$(DOCKER_COMMAND)
     
     if [ -d "$(BUILD_KIT_CACHE)" ]; then
-      DOCKER_COMMAND="$DOCKER_COMMAND --import-cache type=local,src=$BUILD_KIT_CACHE"
+      DOCKER_COMMAND="$DOCKER_COMMAND --import-cache type=local,src=$(BUILD_KIT_CACHE)"
     fi
 
     if [ "$CACHE_HIT" != "True" ]; then 
       DOCKER_COMMAND="$DOCKER_COMMAND --export-cache type=local,dest=$(BUILD_KIT_CACHE)"
     fi
 
-    sudo $(DOCKER_COMMAND)
+    sudo $DOCKER_COMMAND
 
     sudo kill -9 $(jobs -p)
   displayName: 'docker build'
