@@ -8,6 +8,8 @@ pool:
 
 variables:
   imageName: 'your-container-image-name:$(build.buildId)'
+  system.debug: true
+  agent.diagnostic: true
 
 steps:
 - task: RestoreCache@0
