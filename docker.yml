@@ -8,12 +8,12 @@ pool:
 
 variables:
   imageName: 'your-container-image-name'
-  system.debug: false
-  agent.diagnostic: false
+  system.debug: true
+  agent.diagnostic: true
   DOCKER_FOLDER: $(Pipeline.Workspace)/dockercache
   DOCKER_FILE: $(DOCKER_FOLDER)/images
-  IMAGES: $(your-container-image-name)
-  TIMES_I_MESSED_UP: 4
+  IMAGES: '$(your-container-image-name)'
+  TIMES_I_MESSED_UP: 5
 
 steps:
 - task: RestoreCache@0
@@ -39,7 +39,7 @@ steps:
   displayName: Dump images  
 - script: |
     mkdir $(DOCKER_FOLDER)
-    docker save $(IMAGES) > $(DOCKER_FILE)
+    docker save -o $(DOCKER_FILE) $(IMAGES)
 - task: SaveCache@0
   inputs:
     key: |
