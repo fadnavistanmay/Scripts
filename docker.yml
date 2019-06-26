@@ -10,27 +10,32 @@ variables:
   imageName: 'your-container-image-name:$(build.buildId)'
   system.debug: true
   agent.diagnostic: true
+  DOCKER_ROOT: /var/lib/docker
 
 steps:
+- script: |
+    sudo chmod 775 '$(DOCKER_ROOT)'
 - task: RestoreCache@0
   inputs:
     key: |
       $(System.DefaultWorkingDirectory)/DockerFile
       $(Agent.OS)
       $(Agent.JobName)
+      $(DOCKER_ROOT)
       TIMES_I_MESSED_UP = 0
-    path: '/var/lib/docker/image/overlay2/imagedb'
+    path: $(DOCKER_ROOT)
 - script: docker images --all
-- script: sudo ls -l /var/lib/docker/image/overlay2/imagedb
+# - script: sudo ls -l /var/lib/docker/image/overlay2/imagedb
 - script: docker build -f Dockerfile -t $(imageName) .
   displayName: 'docker build'
 - script: docker images --all
-- script: sudo ls -l /var/lib/docker/image/overlay2/imagedb
+# - script: sudo ls -l /var/lib/docker/image/overlay2/imagedb
 - task: SaveCache@0
   inputs:
     key: |
       $(System.DefaultWorkingDirectory)/DockerFile
       $(Agent.OS)
       $(Agent.JobName)
+      $(DOCKER_ROOT)
       TIMES_I_MESSED_UP = 0
-    path: '/var/lib/docker/image/overlay2/imagedb'
+    path: $(DOCKER_ROOT)
