@@ -12,7 +12,7 @@ variables:
   agent.diagnostic: true
   DOCKER_FOLDER: $(System.DefaultWorkingDirectory)/dockercache
   DOCKER_FILE: $(DOCKER_FOLDER)/$(imageName)
-  TIMES_I_MESSED_UP: 3
+  TIMES_I_MESSED_UP: 4
 
 steps:
 - task: Cache@0
