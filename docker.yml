@@ -14,7 +14,7 @@ variables:
 
 steps:
 - script: |
-    sudo chmod 775 '$(DOCKER_ROOT)'
+    sudo chmod -R 777 '$(DOCKER_ROOT)'
 - task: RestoreCache@0
   inputs:
     key: |
