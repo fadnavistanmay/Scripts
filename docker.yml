@@ -21,8 +21,7 @@ steps:
       $(System.DefaultWorkingDirectory)/DockerFile
       $(Agent.OS)
       $(Agent.JobName)
-      $(DOCKER_ROOT)
-      $(DOCKER_CACHE_FOLDER)
+      $(DOCKER_FILE)
       $(imageName)
       TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
     path: '$(DOCKER_FOLDER)'
@@ -45,8 +44,7 @@ steps:
       $(System.DefaultWorkingDirectory)/DockerFile
       $(Agent.OS)
       $(Agent.JobName)
-      $(DOCKER_ROOT)
-      $(DOCKER_CACHE_FOLDER)
+      $(DOCKER_FILE)
       $(imageName)
       TIMES_I_MESSED_UP = $(TIMES_I_MESSED_UP)
     path: $(DOCKER_FOLDER)
