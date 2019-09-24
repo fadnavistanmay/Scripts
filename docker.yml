@@ -37,7 +37,7 @@ steps:
     git checkout $(BUILDKIT_COMMIT)
     make
   displayName: "Build BuildKit on cache miss"
-  condition: and(succeeded(), ne(variables['BuildKitToolHit'], 'True'))
+  condition: and(succeeded(), ne(variables['BuildKitToolHit'], 'true'))
 - script: |
     cd buildkit
     sudo make install
@@ -67,10 +67,12 @@ steps:
     DOCKER_COMMAND="$(DOCKER_COMMAND)"
 
     if [ -d "$(BUILD_KIT_CACHE)" ]; then
+      echo "Will use cached layers from $(BUILD_KIT_CACHE)"
       DOCKER_COMMAND="$DOCKER_COMMAND --import-cache type=local,src=$(BUILD_KIT_CACHE)"
     fi
 
-    if [ "$(BuildKitLayersHit)" != "True" ]; then 
+    if [ "$(BuildKitLayersHit)" != "true" ]; then
+      echo "Will store cached layers to $(BUILD_KIT_CACHE)"
       DOCKER_COMMAND="$DOCKER_COMMAND --export-cache type=local,dest=$(BUILD_KIT_CACHE)"
     fi
 
