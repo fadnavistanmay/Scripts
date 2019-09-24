@@ -14,12 +14,13 @@ variables:
 
   # buildkit tool itself
   BUILD_KIT_CACHE: '$(Pipeline.Workspace)/buildkitcache'
-  BUILDKIT_COMMIT: 646fc0af6d283397b9e47cd0a18779e9d0376e0e
+  BUILDKIT_COMMIT: 10cef0c6e178bcaca1ad02b041a96b1091f52071
   BUILDKIT_CACHE_KEY: GOOFS=0 | buildkit | $(BUILDKIT_COMMIT)
 
   DOCKER_COMMAND: 'buildctl build --frontend=dockerfile.v0 --local context=. --local dockerfile=.'
   CACHE_KEY_SALT: 0
-  CACHE_KEY_FALLBACK_ANY: '"CACHE_KEY_SALT=$(CACHE_KEY_SALT)" | "DOCKER_BUILDKIT=$(DOCKER_BUILDKIT)" | "$(Agent.OS) $(Agent.JobName)" | "$(DOCKER_COMMAND)"'
+  CACHE_KEY_BUILDKIT: '"DOCKER_BUILDKIT=$(DOCKER_BUILDKIT)" | "BUILDKIT_COMMIT=$(BUILDKIT_COMMIT)"'
+  CACHE_KEY_FALLBACK_ANY: '"CACHE_KEY_SALT=$(CACHE_KEY_SALT)" | "$(Agent.OS) $(Agent.JobName)" | $(CACHE_KEY_BUILDKIT) | "$(DOCKER_COMMAND)"'
   CACHE_KEY_FALLBACK_SPEC: '$(CACHE_KEY_FALLBACK_ANY) | $(System.DefaultWorkingDirectory)/Dockerfile,$(System.DefaultWorkingDirectory)/Cargo.*'
   CACHE_KEY_THIS_BUILD: '$(CACHE_KEY_FALLBACK_SPEC) | "Build.BuildId=$(Build.BuildId)"'
 
