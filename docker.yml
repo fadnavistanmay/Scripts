@@ -11,51 +11,34 @@ variables:
   system.debug: 'true'
   agent.diagnostic: 'true'
 
-  # buildkit
+  # buildkit tool itself
   BUILD_KIT_CACHE: '$(Pipeline.Workspace)/buildkitcache'
   BUILDKIT_COMMIT: 646fc0af6d283397b9e47cd0a18779e9d0376e0e
-  BUILDKIT_CACHE_KEY: |
-    buildkit
-    $(BUILDKIT_COMMIT)
-    GOOFS=0
+  BUILDKIT_CACHE_KEY: GOOFS=0 | buildkit | $(BUILDKIT_COMMIT)
 
   DOCKER_COMMAND: 'buildctl build --frontend=dockerfile.v0 --local context=. --local dockerfile=.'
-  TIMES_I_MESSED_UP: 11
-  CACHE_KEY_BASE: |
-    $(Agent.OS) $(Agent.JobName)
-    $(DOCKER_COMMAND)
-    DOCKER_BUILDKIT=$(DOCKER_BUILDKIT)
-    TIMES_I_MESSED_UP=$(TIMES_I_MESSED_UP)
-  CACHE_KEY_EXACT: |
-    $(CACHE_KEY_BASE)
-    $(System.DefaultWorkingDirectory)/Dockerfile
-  CACHE_FALLBACK_COMMIT_FILE: $(Pipeline.Workspace)/common_commit.txt
-  CACHE_KEY_FALLBACK: |
-    $(CACHE_KEY_BASE)
-    $(CACHE_FALLBACK_COMMIT_FILE)
+  TIMES_I_MESSED_UP: 0
+  CACHE_KEY_BASE: "'TIMES_I_MESSED_UP=$(TIMES_I_MESSED_UP)' | 'DOCKER_BUILDKIT=$(DOCKER_BUILDKIT)' | '$(Agent.OS) $(Agent.JobName)' | '$(DOCKER_COMMAND)'"
+    
+  CACHE_KEY_EXACT: "$(CACHE_KEY_BASE) | $(System.DefaultWorkingDirectory)/Dockerfile,$(System.DefaultWorkingDirectory)/Cargo.*"
+  CACHE_KEY_FALLBACK_ANY: "$(CACHE_KEY_BASE)"
 
 steps:
 
 # Build/restore the BuildKit tool 
-- task: RestoreCache@0
+- task: CacheBeta@0
   inputs:
     key: $(BUILDKIT_CACHE_KEY)
     path: '$(System.DefaultWorkingDirectory)/buildkit'
     cacheHitVar: 'BuildKitToolHit'
   displayName: 'Look for exact hit'
-
 - script: |
     git clone https://github.com/moby/buildkit.git
     cd buildkit
     git checkout $(BUILDKIT_COMMIT)
     make
-  displayName: "Build BuildKit"
-  condition: and(succeeded(), ne(variables['PipelineCache.BuildKitToolHit'], 'True'))
-- task: SaveCache@0
-  inputs:
-    key: $(BUILDKIT_CACHE_KEY)
-    path: '$(System.DefaultWorkingDirectory)/buildkit'
-  condition: and(and(succeeded(), ne(variables['PipelineCache.BuildKitToolHit'], 'True')), eq(variables['Build.SourceBranchName'], 'master'))
+  displayName: "Build BuildKit on cache miss"
+  condition: and(succeeded(), ne(variables['BuildKitToolHit'], 'True'))
 - script: |
     cd buildkit
     sudo make install
@@ -63,29 +46,14 @@ steps:
     which buildkitd
 
 # restore the BuildKit cache based on the Dockerfile ...
-- task: RestoreCache@0
+- task: CacheBeta@0
   inputs:
     key: $(CACHE_KEY_EXACT)
     path: '$(BUILD_KIT_CACHE)'
-    cacheHitVar: 'BuildKitCacheHit'
-  displayName: 'Look for exact hit'
-- script: |
-    echo "Temporary workaround"
-    echo "##vso[task.setvariable variable=CACHE_HIT;]True"
-  condition: and(succeeded(), eq(variables['PipelineCache.BuildKitCacheHit'], 'True'))
-
-# ... or based on the common commit ID of master (which has a CI) and this branch
-- script: |
-    git merge-base -a origin/master HEAD > $(CACHE_FALLBACK_COMMIT_FILE)
-    cat $(CACHE_FALLBACK_COMMIT_FILE)
-  # condition: and(succeeded(), ne(variables['PipelineCache.BuildKitCacheHit'], 'True'))
-- task: RestoreCache@0
-  inputs:
-    key: $(CACHE_KEY_FALLBACK)
-    path: '$(BUILD_KIT_CACHE)'
-    cacheHitVar: 'BuildKitFallbackHit'
-  displayName: 'Look for inexact hit'
-  condition: and(succeeded(), ne(variables['PipelineCache.BuildKitCacheHit'], 'True'))
+    cacheHitVar: 'BuildKitLayersHit'
+    restoreKeys: |
+      $(CACHE_KEY_FALLBACK_ANY)
+  displayName: 'Look for layers cache'
 
 - script: |
     set -e -x
@@ -111,15 +79,4 @@ steps:
 
     sudo kill -9 $(jobs -p)
   displayName: 'docker build'
-
-- task: SaveCache@0
-  inputs:
-    key: $(CACHE_KEY_FALLBACK)
-    path: '$(BUILD_KIT_CACHE)'
-  condition: and(and(succeeded(), ne(variables['PipelineCache.DockerCacheHitFallback'], 'True')), eq(variables['Build.SourceBranchName'], 'master'))
-- task: SaveCache@0
-  inputs:
-    key: $(CACHE_KEY_EXACT)
-    path: '$(BUILD_KIT_CACHE)'
-  condition: and(and(succeeded(), ne(variables['PipelineCache.BuildKitCacheHit'], 'True')), eq(variables['Build.SourceBranchName'], 'master'))
   

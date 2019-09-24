@@ -7,10 +7,17 @@ FROM rust:1.31
 # Set the working directory to /app
 WORKDIR /
 
+COPY ./Cargo.toml ./Cargo.lock ./
+RUN mkdir src/
+RUN echo "fn main() { }" > src/main.rs
+RUN cargo build 
+RUN rm ./target/debug/deps/cargo2junit*
+RUN rm ./Cargo.*
+#RUN cargo build --release
+
 # Copy the current directory contents into the container at /app
 ADD Cargo.* /
 ADD src/* /src/
 
 RUN cargo build
-
-RUN cargo build --release
+#RUN cargo build --release
