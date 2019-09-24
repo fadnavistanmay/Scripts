@@ -18,7 +18,7 @@ variables:
   BUILDKIT_CACHE_KEY: GOOFS=0 | buildkit | $(BUILDKIT_COMMIT)
 
   DOCKER_COMMAND: 'buildctl build --frontend=dockerfile.v0 --local context=. --local dockerfile=.'
-  CACHE_KEY_SALT: 0
+  CACHE_KEY_SALT: 1
   CACHE_KEY_BUILDKIT: '"DOCKER_BUILDKIT=$(DOCKER_BUILDKIT)" | "BUILDKIT_COMMIT=$(BUILDKIT_COMMIT)"'
   CACHE_KEY_FALLBACK_ANY: '"CACHE_KEY_SALT=$(CACHE_KEY_SALT)" | "$(Agent.OS) $(Agent.JobName)" | $(CACHE_KEY_BUILDKIT) | "$(DOCKER_COMMAND)"'
   CACHE_KEY_FALLBACK_SPEC: '$(CACHE_KEY_FALLBACK_ANY) | $(System.DefaultWorkingDirectory)/Dockerfile,$(System.DefaultWorkingDirectory)/Cargo.*'
