@@ -68,6 +68,7 @@ steps:
 
     if [ -d "$(BUILD_KIT_CACHE)" ]; then
       echo "Will use cached layers from $(BUILD_KIT_CACHE)"
+      find $(BUILD_KIT_CACHE)
       DOCKER_COMMAND="$DOCKER_COMMAND --import-cache type=local,src=$(BUILD_KIT_CACHE)"
     fi
 

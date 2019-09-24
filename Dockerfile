@@ -1,5 +1,5 @@
 # Use an official rust as a parent image
-FROM rust:1.31
+FROM rust:1.37
 
 # more setup and adding of tools ...
 # COMMENT 1
