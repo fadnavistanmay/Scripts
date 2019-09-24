@@ -19,5 +19,5 @@ RUN rm ./Cargo.*
 ADD Cargo.* /
 ADD src/* /src/
 
-RUN cargo build
+RUN time cargo build
 #RUN cargo build --release

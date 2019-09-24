@@ -7,6 +7,7 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 variables:
+  skipComponentGovernanceDetection: 'true'
   DOCKER_BUILDKIT: 1
   system.debug: 'true'
   agent.diagnostic: 'true'
@@ -30,7 +31,7 @@ steps:
     key: $(BUILDKIT_CACHE_KEY)
     path: '$(System.DefaultWorkingDirectory)/buildkit'
     cacheHitVar: 'BuildKitToolHit'
-  displayName: 'Look for exact hit'
+  displayName: 'cache buildkit tool'
 - script: |
     git clone https://github.com/moby/buildkit.git
     cd buildkit
@@ -52,7 +53,7 @@ steps:
     cacheHitVar: 'BuildKitLayersHit'
     restoreKeys: |
       $(CACHE_KEY_FALLBACK_ANY)
-  displayName: 'Look for layers cache'
+  displayName: 'cache docker layers'
 
 - script: |
     set -e -x
