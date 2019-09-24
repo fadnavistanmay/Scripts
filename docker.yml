@@ -18,10 +18,9 @@ variables:
 
   DOCKER_COMMAND: 'buildctl build --frontend=dockerfile.v0 --local context=. --local dockerfile=.'
   TIMES_I_MESSED_UP: 0
-  CACHE_KEY_BASE: "'TIMES_I_MESSED_UP=$(TIMES_I_MESSED_UP)' | 'DOCKER_BUILDKIT=$(DOCKER_BUILDKIT)' | '$(Agent.OS) $(Agent.JobName)' | '$(DOCKER_COMMAND)'"
-    
-  CACHE_KEY_EXACT: "$(CACHE_KEY_BASE) | $(System.DefaultWorkingDirectory)/Dockerfile,$(System.DefaultWorkingDirectory)/Cargo.*"
-  CACHE_KEY_FALLBACK_ANY: "$(CACHE_KEY_BASE)"
+  CACHE_KEY_BASE: '"TIMES_I_MESSED_UP=$(TIMES_I_MESSED_UP)" | "DOCKER_BUILDKIT=$(DOCKER_BUILDKIT)" | "$(Agent.OS) $(Agent.JobName)" | "$(DOCKER_COMMAND)"'
+  CACHE_KEY_EXACT: '$(CACHE_KEY_BASE) | $(System.DefaultWorkingDirectory)/Dockerfile,$(System.DefaultWorkingDirectory)/Cargo.*'
+  CACHE_KEY_FALLBACK_ANY: '$(CACHE_KEY_BASE)'
 
 steps:
 
