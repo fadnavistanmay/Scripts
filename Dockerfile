@@ -10,8 +10,8 @@ WORKDIR /
 COPY ./Cargo.toml ./Cargo.lock ./
 RUN mkdir src/
 RUN echo "fn main() { }" > src/main.rs
-RUN cargo build 
-RUN cargo build --release
+RUN cargo build --frozen --locked
+RUN cargo build --frozen --locked --release
 RUN rm ./target/debug/deps/cargo2junit*
 RUN rm ./target/release/deps/cargo2junit*
 RUN rm ./Cargo.*
@@ -21,5 +21,5 @@ RUN rm ./Cargo.*
 ADD Cargo.* /
 ADD src/* /src/
 
-RUN cargo build
-RUN cargo build --release
+RUN cargo build --frozen --locked
+RUN cargo build --frozen --locked --release
