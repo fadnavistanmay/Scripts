@@ -18,7 +18,7 @@ variables:
   BUILDKIT_CACHE_KEY: GOOFS=0 | buildkit | $(BUILDKIT_COMMIT)
 
   DOCKER_COMMAND: 'buildctl build --frontend=dockerfile.v0 --local context=. --local dockerfile=.'
-  CACHE_KEY_SALT: 1
+  CACHE_KEY_SALT: 2
   CACHE_KEY_BUILDKIT: '"DOCKER_BUILDKIT=$(DOCKER_BUILDKIT)" | "BUILDKIT_COMMIT=$(BUILDKIT_COMMIT)"'
   CACHE_KEY_FALLBACK: '"CACHE_KEY_SALT=$(CACHE_KEY_SALT)" | "$(Agent.OS) $(Agent.JobName)" | $(CACHE_KEY_BUILDKIT) | "$(DOCKER_COMMAND)"'
   CACHE_KEY_EXACT: '$(CACHE_KEY_FALLBACK) | $(System.DefaultWorkingDirectory)/Dockerfile,$(System.DefaultWorkingDirectory)/Cargo.*'
@@ -75,7 +75,7 @@ steps:
 
     if [ "$(BuildKitLayersHit)" != "true" ]; then
       echo "Will store cached layers to $(BUILD_KIT_CACHE)"
-      DOCKER_COMMAND="$DOCKER_COMMAND --export-cache type=local,dest=$(BUILD_KIT_CACHE)"
+      DOCKER_COMMAND="$DOCKER_COMMAND --export-cache mode=max,type=local,dest=$(BUILD_KIT_CACHE)"
     fi
 
     sudo $DOCKER_COMMAND
